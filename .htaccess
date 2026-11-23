@@ -1,0 +1,21 @@
+# Laragon / shared hosting: arahkan root domain ke folder public Laravel.
+# Jika virtual host sudah memakai document root public/, file ini tidak terpakai.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Tolak akses langsung ke berkas sensitif bila document root masih di root proyek.
+    RewriteRule (^|/)\.(env|git).* - [F,L]
+    RewriteRule ^(composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml|artisan)$ - [F,L]
+    RewriteRule ^(app|bootstrap|config|database|resources|routes|storage|tests|vendor)(/|$) - [F,L]
+
+    # Jangan menulis ulang bila request sudah menuju folder public/.
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
